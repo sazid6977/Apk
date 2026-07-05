@@ -43,50 +43,6 @@ jobs:
           unzip -q templates.tpz -d /tmp/templates
           mv /tmp/templates/templates/* ~/.local/share/godot/export_templates/4.7.stable/
 
-      - name: Create Export Presets
-        run: |
-          cat > export_presets.cfg << 'PRESETS'
-[preset.0]
-
-name="Android"
-platform="Android"
-runnable=true
-dedicated_server=false
-custom_features=""
-export_filter="all_resources"
-include_filter=""
-exclude_filter=""
-export_path="UnityAdsTest.apk"
-encryption_include_filters=""
-encryption_exclude_filters=""
-encrypt_pck=false
-encrypt_directory=false
-
-[preset.0.options]
-
-custom_template/debug=""
-custom_template/release=""
-gradle_build/use_gradle_build=false
-architectures/armeabi-v7a=false
-architectures/arm64-v8a=true
-package/unique_name="com.sazid6977.unityadstest"
-package/name="UnityAdsTest"
-package/signed=false
-package/app_category="Game"
-launcher_icons/main_192x192=""
-launcher_icons/adaptive_foreground_432x432=""
-launcher_icons/adaptive_background_432x432=""
-graphics/opengl_debug=false
-xr_features/xr_mode=0
-screen/immersive_mode=true
-screen/support_small=true
-screen/support_normal=true
-screen/support_large=true
-screen/support_xlarge=true
-texture_format/s3tc_bptc=false
-texture_format/etc2_astc=true
-PRESETS
-
       - name: Export APK
         run: |
           ./Godot_v4.7-stable_linux.x86_64 --headless --export-debug "Android" UnityAdsTest.apk
