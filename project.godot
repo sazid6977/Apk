@@ -15,3 +15,6 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/UnityAds/plugin.cfg")
+
+[rendering]
+textures/vram_compression/import_etc2_astc=true
