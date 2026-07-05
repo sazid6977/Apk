@@ -1,0 +1,95 @@
+name: Build Unity Ads APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Unity Ads AAR
+        run: |
+          mkdir -p addons/UnityAds
+          wget -q "https://github.com/sazid6977/UnityAds/releases/latest/download/UnityAdsPlugin.aar" \
+            -O addons/UnityAds/UnityAdsPlugin.aar || \
+          wget -q "https://repo1.maven.org/maven2/com/unity3d/ads/unity-ads/4.9.2/unity-ads-4.9.2.aar" \
+            -O addons/UnityAds/UnityAdsPlugin.aar
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Download Godot
+        run: |
+          wget -q "https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip" \
+            -O godot.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.7-stable_linux.x86_64
+          echo "Godot downloaded"
+
+      - name: Download Android Export Template
+        run: |
+          wget -q "https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_export_templates.tpz" \
+            -O templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.7.stable
+          unzip -q templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates/* ~/.local/share/godot/export_templates/4.7.stable/
+          echo "Templates installed"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create Export Presets
+        run: |
+          cat > export_presets.cfg << 'EOF'
+          [preset.0]
+          name="Android"
+          platform="Android"
+          runnable=true
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_resources"
+          include_filter=""
+          exclude_filter=""
+          export_path="UnityAdsTest.apk"
+          encryption_include_filters=""
+          encryption_exclude_filters=""
+          encrypt_pck=false
+          encrypt_directory=false
+
+          [preset.0.options]
+          custom_template/debug=""
+          custom_template/release=""
+          gradle_build/use_gradle_build=true
+          gradle_build/gradle_build_directory="res://android"
+          gradle_build/android_source_template=""
+          architectures/armeabi-v7a=false
+          architectures/arm64-v8a=true
+          keystore/debug=""
+          keystore/debug_user=""
+          keystore/debug_password=""
+          keystore/release=""
+          keystore/release_user=""
+          keystore/release_password=""
+          package/unique_name="com.sazid6977.unityadstest"
+          package/name="UnityAdsTest"
+          package/signed=false
+          EOF
+
+      - name: Export APK
+        run: |
+          ./Godot_v4.7-stable_linux.x86_64 --headless --export-debug "Android" UnityAdsTest.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: UnityAdsTest
+          path: UnityAdsTest.apk
