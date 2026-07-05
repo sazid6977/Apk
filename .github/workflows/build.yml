@@ -43,14 +43,6 @@ jobs:
           unzip -q templates.tpz -d /tmp/templates
           mv /tmp/templates/templates/* ~/.local/share/godot/export_templates/4.7.stable/
 
-      - name: Install Android Build Template
-        run: |
-          wget -q "https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_android_source.zip" \
-            -O android_source.zip
-          mkdir -p android/build
-          unzip -q android_source.zip -d android/build/
-          touch android/.gitignore
-
       - name: Create Export Presets
         run: |
           cat > export_presets.cfg << 'EOF'
@@ -61,8 +53,7 @@ jobs:
           export_path="UnityAdsTest.apk"
 
           [preset.0.options]
-          gradle_build/use_gradle_build=true
-          gradle_build/gradle_build_directory="res://android"
+          gradle_build/use_gradle_build=false
           architectures/arm64-v8a=true
           package/unique_name="com.sazid6977.unityadstest"
           package/name="UnityAdsTest"
